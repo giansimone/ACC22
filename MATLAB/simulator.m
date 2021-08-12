@@ -1,5 +1,5 @@
 %% simulator.m
-%%% JUNE 27, 2021
+%%% JUNE 28, 2021
 
 classdef simulator
     
@@ -33,15 +33,15 @@ classdef simulator
         end
         
         function plot_simulation(obj)
-            str_var = {'mRNA_z', 'p_z', 'mRNA_g', 'p_g'};
-            F = figure('Position',[0 0 640 480]);
+            str_var = {'m_z', 'p_z', 'm_g', 'p_g'};
+            F = figure('Position',[0 0 320 320]);
             set(F, 'defaultLineLineWidth', 2)
             set(F, 'defaultAxesFontSize', 16)
-            subplot(1,2,1)
             plot(obj.t, obj.x(:,2), obj.t, obj.x(:,4));
             xlabel('Time (h)');
-            ylabel('Concentration');
+            ylabel('Concentration (uM)');
             legend(str_var{[2,4]});
+            title(['c = ' num2str(obj.parameters('c')) ' (uM)']); 
         end
         
     end
@@ -52,10 +52,10 @@ classdef simulator
             obj.init_conditions = containers.Map('KeyType', 'char', ...
             'ValueType', 'double');
         
-            obj.init_conditions('mz') = 0.1;
-            obj.init_conditions('pz') = 0.1;
-            obj.init_conditions('mg') = 0.1;
-            obj.init_conditions('pg') = 0.1;
+            obj.init_conditions('mz') = 0;
+            obj.init_conditions('pz') = 0;
+            obj.init_conditions('mg') = 0;
+            obj.init_conditions('pg') = 0;
         end
         
         function obj = set_default_parameters(obj)
