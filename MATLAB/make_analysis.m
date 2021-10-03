@@ -10,12 +10,12 @@ if ~isfile('./ss_output_data.mat')
     
     s.tf = 1000;
     
-    c_arr = 1e-3:1e-3:.4;
+    c_arr = linspace(1e-5, 1e-1, 1000);
     dim_arr = length(c_arr);
     ss_output = nan(1, dim_arr);
     
     for z = 1:dim_arr
-        disp(num2str(z));
+        disp([num2str(z), '/', num2str(dim_arr)]);
         s.parameters('c') = c_arr(z);
         %% Execute the simulation
         s = s.simulate_model;
@@ -23,16 +23,16 @@ if ~isfile('./ss_output_data.mat')
     end
     
     %% Save data results
-    save('./ss_data.mat', 'c_arr', 'pgss');
+    save('./ss_output_data.mat', 'c_arr', 'ss_output');
 end
 
 %% Plot analysis
 clear
-F = figure('Position',[0 0 360 360]);
-set(F, 'defaultLineLineWidth', 2)
-set(F, 'defaultAxesFontSize', 16)
-load(['./MAT_data/results_analysis_' num2str(z)]);
+F = figure('Position', [0 0 360 360]);
+set(F, 'defaultLineLineWidth', 2);
+set(F, 'defaultAxesFontSize', 16);
+load('./ss_output_data.mat');
 plot(c_arr, ss_output);
-xlabel('Plasmid concentration c (uM)');
-ylabel('Steady-state concentration (uM)');
-legend(str_var);
+xlabel('Plasmid copy number (uM)');
+ylabel('Steady-state output (uM)');
+ylim([0,4])
