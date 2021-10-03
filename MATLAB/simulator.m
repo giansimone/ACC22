@@ -1,5 +1,5 @@
 %% simulator.m
-%%% AUGUST 12, 2021
+%%% OCTOBER 3, 2021
 
 classdef simulator
     
@@ -7,12 +7,12 @@ classdef simulator
         x0;
         t;
         x;
-        mu;
+% %         mu;
     end
     
     properties (SetAccess = public)
         opt = odeset('RelTol', 1e-12, 'AbsTol', 1e-16);
-        tf = 2;
+        tf = 100;
         init_conditions;
         parameters;
     end
@@ -31,11 +31,11 @@ classdef simulator
             obj = obj.set_x0;
             [obj.t, obj.x] = ode15s(@obj.ss_model, [0, obj.tf], ...
                 obj.x0, obj.opt);
-            obj = obj.get_growth_rate;
+% %             obj = obj.get_growth_rate;
         end
         
         function plot_simulation(obj)
-            str_var = {'m_z', 'p_z', 'm_g', 'p_g'};
+            str_var = {'m_y', 'p_y', 'm_z', 'p_z'};
             F = figure('Position',[0 0 320 320]);
             set(F, 'defaultLineLineWidth', 2)
             set(F, 'defaultAxesFontSize', 16)
@@ -54,71 +54,72 @@ classdef simulator
             obj.init_conditions = containers.Map('KeyType', 'char', ...
             'ValueType', 'double');
         
+            obj.init_conditions('my') = 0;
+            obj.init_conditions('py') = 0;
             obj.init_conditions('mz') = 0;
             obj.init_conditions('pz') = 0;
-            obj.init_conditions('mg') = 0;
-            obj.init_conditions('pg') = 0;
         end
         
         function obj = set_default_parameters(obj)
             obj.parameters = containers.Map('KeyType', 'char', ...
                 'ValueType', 'double');
             
-            obj.parameters('c') = .2; % (uM)
-            obj.parameters('rt') = .14; % (uM)
-            obj.parameters('az') = 100; % (/h)
-            obj.parameters('bz') = 5; % (/h)
-            obj.parameters('gz') = 100; % (/h)
-            obj.parameters('dz') = .04; % (/h) %%%%%%%
-            obj.parameters('kz') = 15; % (uM)
-            obj.parameters('ag') = 100; % (/h)
-            obj.parameters('bg') = 5; % (/h)
-            obj.parameters('gg') = 100; % (/h)
-            obj.parameters('dg') = .04; % (/h) %%%%%%
-            obj.parameters('kg') = 15; % (uM)
-            obj.parameters('mu0') = .4; % (/h)
-            obj.parameters('Kmu') = 0.07; % (uM)
+            obj.parameters('c') = 1e-1; % (uM)
+            obj.parameters('r0') = 1; % (uM)
+            obj.parameters('ay') = 1; % (/h)
+            obj.parameters('by') = 1; % (/h)
+            obj.parameters('gy') = 1; % (/h)
+            obj.parameters('dy') = .173; % (/h) %%%%%%%
+            obj.parameters('ky') = 1e-3; % (uM)
+            obj.parameters('az') = 1; % (/h)
+            obj.parameters('bz') = 1; % (/h)
+            obj.parameters('gz') = 1; % (/h)
+            obj.parameters('dz') = .173; % (/h) %%%%%%
+            obj.parameters('kz') = 1e-3; % (uM)
+% %             obj.parameters('mu0') = .4; % (/h)
+% %             obj.parameters('Kmu') = 0.07; % (uM)
         end
         
         function obj = set_x0(obj)
             obj.x0 = [
+                      obj.init_conditions('my');
+                      obj.init_conditions('py');
                       obj.init_conditions('mz');
                       obj.init_conditions('pz');
-                      obj.init_conditions('mg');
-                      obj.init_conditions('pg');
                       ];
         end
         
-        function obj = get_growth_rate(obj)
-            n = length(obj.t);
-            obj.mu = nan(n,1);
-            for z = 1:n
-                xTemp = obj.x(z,:).';
-                [~, muTemp] = obj.ss_model(NaN, xTemp);
-                obj.mu(z) = muTemp;
-            end
-        end
+% %         function obj = get_growth_rate(obj)
+% %             n = length(obj.t);
+% %             obj.mu = nan(n,1);
+% %             for z = 1:n
+% %                 xTemp = obj.x(z,:).';
+% %                 [~, muTemp] = obj.ss_model(NaN, xTemp);
+% %                 obj.mu(z) = muTemp;
+% %             end
+% %         end
         
-        function [dxdt, muTemp] = ss_model(obj, ~, x)
+        function dxdt = ss_model(obj, ~, x)
+% %         function [dxdt, muTemp] = ss_model(obj, ~, x)
             %% Assign the parameters' map to the variable p
             par = obj.parameters;
             
             %% Assign the state x to the single variables
-            mz = x(1);
-            pz = x(2);
-            mg = x(3);
-            pg = x(4);
+            my = x(1);
+            py = x(2);
+            mz = x(3);
+            pz = x(4);
             
-            %% Compute growth rate mu
-            muTemp = par('mu0') .* par('rt') ./ (par('rt') + par('Kmu') .* (...
-                1 + mz ./ par('kz') + mg ./ par('kg')));
+% %             %% Compute growth rate mu
+% %             muTemp = par('mu0') .* par('r0') ./ (par('r0') + par('Kmu') .* (...
+% %                 1 + my ./ par('ky') + mz ./ par('kz')));
             
             %% Assign the vector state dxdt
             dxdt = [
+                    par('c') .* par('ay') - par('by') .* my;
+                    par('gy') .* (my ./ par('ky')) ./ (1 + my ./ par('ky') + mz ./ par('kz')) .* par('r0') - par('dy') .* py;
                     par('c') .* par('az') - par('bz') .* mz;
-                    par('gz') .* (mz ./ par('kz')) ./ (1 + mz ./ par('kz') + mg ./ par('kg')) .* par('rt') - (par('dz') + muTemp) .* pz;
-                    par('c') .* par('ag') - par('bg') .* mg;
-                    par('gg') .* (mg ./ par('kg')) ./ (1 + mz ./ par('kz') + mg ./ par('kg')) .* par('rt') - (par('dg') + muTemp) .* pg;
+                    par('gz') .* (mz ./ par('kz')) ./ (1 + my ./ par('ky') + mz ./ par('kz')) .* par('r0') - par('dz') .* pz;
                     ];
         end
         
