@@ -1,5 +1,5 @@
 %% simulator.m
-%%% JUNE 28, 2021
+%%% AUGUST 12, 2021
 
 classdef simulator
     
@@ -7,6 +7,7 @@ classdef simulator
         x0;
         t;
         x;
+        mu;
     end
     
     properties (SetAccess = public)
@@ -28,8 +29,9 @@ classdef simulator
         
         function obj = simulate_model(obj)
             obj = obj.set_x0;
-            [obj.t, obj.x] = ode15s(@obj.model_odes, [0, obj.tf], ...
+            [obj.t, obj.x] = ode15s(@obj.ss_model, [0, obj.tf], ...
                 obj.x0, obj.opt);
+            obj = obj.get_growth_rate;
         end
         
         function plot_simulation(obj)
@@ -67,13 +69,15 @@ classdef simulator
             obj.parameters('az') = 100; % (/h)
             obj.parameters('bz') = 5; % (/h)
             obj.parameters('gz') = 100; % (/h)
-            obj.parameters('dz') = .4; % (/h)
-            obj.parameters('kz') = 15; % (mM)
+            obj.parameters('dz') = .04; % (/h) %%%%%%%
+            obj.parameters('kz') = 15; % (uM)
             obj.parameters('ag') = 100; % (/h)
             obj.parameters('bg') = 5; % (/h)
             obj.parameters('gg') = 100; % (/h)
-            obj.parameters('dg') = .4; % (/h)
-            obj.parameters('kg') = 15; % (mM)
+            obj.parameters('dg') = .04; % (/h) %%%%%%
+            obj.parameters('kg') = 15; % (uM)
+            obj.parameters('mu0') = .4; % (/h)
+            obj.parameters('Kmu') = 0.07; % (uM)
         end
         
         function obj = set_x0(obj)
@@ -85,7 +89,17 @@ classdef simulator
                       ];
         end
         
-        function dxdt = model_odes(obj, ~, x)
+        function obj = get_growth_rate(obj)
+            n = length(obj.t);
+            obj.mu = nan(n,1);
+            for z = 1:n
+                xTemp = obj.x(z,:).';
+                [~, muTemp] = obj.ss_model(NaN, xTemp);
+                obj.mu(z) = muTemp;
+            end
+        end
+        
+        function [dxdt, muTemp] = ss_model(obj, ~, x)
             %% Assign the parameters' map to the variable p
             par = obj.parameters;
             
@@ -95,12 +109,16 @@ classdef simulator
             mg = x(3);
             pg = x(4);
             
+            %% Compute growth rate mu
+            muTemp = par('mu0') .* par('rt') ./ (par('rt') + par('Kmu') .* (...
+                1 + mz ./ par('kz') + mg ./ par('kg')));
+            
             %% Assign the vector state dxdt
             dxdt = [
                     par('c') .* par('az') - par('bz') .* mz;
-                    par('gz') .* (mz ./ par('kz')) ./ (1 + mz ./ par('kz') + mg ./ par('kg')) .* par('rt') - par('dz') .* pz;
+                    par('gz') .* (mz ./ par('kz')) ./ (1 + mz ./ par('kz') + mg ./ par('kg')) .* par('rt') - (par('dz') + muTemp) .* pz;
                     par('c') .* par('ag') - par('bg') .* mg;
-                    par('gg') .* (mg ./ par('kg')) ./ (1 + mz ./ par('kz') + mg ./ par('kg')) .* par('rt') - par('dg') .* pg;
+                    par('gg') .* (mg ./ par('kg')) ./ (1 + mz ./ par('kz') + mg ./ par('kg')) .* par('rt') - (par('dg') + muTemp) .* pg;
                     ];
         end
         

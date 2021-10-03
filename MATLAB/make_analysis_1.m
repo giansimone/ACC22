@@ -1,5 +1,5 @@
 %% make_analysis_1.m
-%%% JUNE 28, 2021
+%%% SEPTEMBER 16, 2021
 
 clear
 close all 
@@ -8,8 +8,8 @@ close all
 s = simulator;
 
 s.tf = 40;
-s.parameters('az') = 100;
-s.parameters('kz') = 1.5;
+s.parameters('az') = 400;
+s.parameters('kz') = 5;
 
 c_arr = 1e-3:1e-3:.4;
 dim_arr = length(c_arr);
@@ -24,11 +24,12 @@ for z = 1:dim_arr
 end
 
 %% Save data results
-save('./MAT_data/results_analysis_2', 'c_arr', 'pgss');
+save('./MAT_data/results_analysis_4', 'c_arr', 'pgss');
 
 %% Plot analysis
 clear
 str_var = {'\alpha_z = 100 and \kappa_z = 15', '\alpha_z = 100 and \kappa_z = 1.5', '\alpha_z = 400 and \kappa_z = 1.5'};
+str_var = {'a_z = 100 and k_z = 15', 'a_z = 100 and k_z = 1.5', 'a_z = 400 and k_z = 1.5'};
 F = figure('Position',[0 0 360 360]);
 set(F, 'defaultLineLineWidth', 2)
 set(F, 'defaultAxesFontSize', 16)
