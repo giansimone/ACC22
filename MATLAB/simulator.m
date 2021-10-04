@@ -1,5 +1,5 @@
 %% simulator.m
-%%% OCTOBER 3, 2021
+%%% OCTOBER 4, 2021
 
 classdef simulator
     
@@ -41,7 +41,7 @@ classdef simulator
             set(F, 'defaultAxesFontSize', 16)
             plot(obj.t, obj.x(:,2), obj.t, obj.x(:,4));
             xlabel('Time (h)');
-            ylabel('Concentration (uM)');
+            ylabel('Concentration (nM)');
             legend(str_var{[2,4]});
             title(['c = ' num2str(obj.parameters('c')) ' (uM)']); 
         end
@@ -64,18 +64,18 @@ classdef simulator
             obj.parameters = containers.Map('KeyType', 'char', ...
                 'ValueType', 'double');
             
-            obj.parameters('c') = 1e-1; % (uM)
-            obj.parameters('r0') = 1; % (uM)
+            obj.parameters('c') = 100; % (nM)
+            obj.parameters('r0') = 1000; % (nM)
             obj.parameters('ay') = 1; % (/h)
             obj.parameters('by') = 1; % (/h)
             obj.parameters('gy') = 1; % (/h)
-            obj.parameters('dy') = .173; % (/h) %%%%%%%
-            obj.parameters('ky') = 1e-3; % (uM)
+            obj.parameters('dy') = .347; % (/h) % Half-life ~ 2 hours
+            obj.parameters('ky') = 1; % (nM)
             obj.parameters('az') = 1; % (/h)
             obj.parameters('bz') = 1; % (/h)
             obj.parameters('gz') = 1; % (/h)
-            obj.parameters('dz') = .173; % (/h) %%%%%%
-            obj.parameters('kz') = 1e-3; % (uM)
+            obj.parameters('dz') = .347; % (/h) % Half-life ~ 2 hours
+            obj.parameters('kz') = 1; % (nM)
 % %             obj.parameters('mu0') = .4; % (/h)
 % %             obj.parameters('Kmu') = 0.07; % (uM)
         end
