@@ -36,7 +36,7 @@ for q = 1:size(tab,1)
             s.parameters('c') = c_arr(z);
             %% Execute the simulation
             s = s.simulate_model;
-            ss_output(z) = s.x(end,4);
+            ss_output(z) = s.x(end,2);
         end
         %% Save data results
         save(file_str, 'c_arr', 'tmp_az', 'tmp_kz', 'ss_output');
@@ -62,3 +62,4 @@ for q = 1:size(tab,1)
 end
 xlabel('Plasmid concentration c (nM)');
 ylabel('Steady-state concentration py (nM)');
+ylim([1000,3000])
