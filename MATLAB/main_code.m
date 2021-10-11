@@ -8,9 +8,9 @@ s = simulator;
 
 s.tf = 100;
 
-s.parameters('az') = 1;
-s.parameters('kz') = 100;
-s.parameters('c') = 1;
+s.parameters('az') = 0;
+% s.parameters('kz') = 100;
+% s.parameters('c') = 10^100;
 
 %% Execute the simulation
 s = s.simulate_model;
