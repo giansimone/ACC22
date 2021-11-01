@@ -1,5 +1,5 @@
 %% main_code.m
-%%% OCTOBER 4, 2021
+%%% OCTOBER 11, 2021
 
 close all 
 
@@ -8,9 +8,9 @@ s = simulator;
 
 s.tf = 100;
 
-s.parameters('az') = 0;
+% s.parameters('az') = 0;
 % s.parameters('kz') = 100;
-% s.parameters('c') = 10^100;
+% s.parameters('c') = 10;
 
 %% Execute the simulation
 s = s.simulate_model;
