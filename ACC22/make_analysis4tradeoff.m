@@ -1,5 +1,5 @@
 %% make_analysis4tradeoff.m
-%%% OCTOBER 11, 2021
+%%% MARCH 4, 2022
 
 clear
 
@@ -7,14 +7,13 @@ clear
 cmin = 1; % (nM)
 
 %% Create the vector 'kz_arr'
-% kz_arr = linspace(.1, 100, 10);
 kz_arr = logspace(-2, 2, 1000);
 dim_arr = length(kz_arr);
 
 %% Create the object 's' from the class 'simulator'
 file_str = './ss_tradeoff_data.mat';
 if ~isfile(file_str)
-    disp([file_str, ' found'])
+    disp([file_str, 'File not found'])
     %% Create the simulate object 's_cmin_wz0'
     s_cmin_wz0 = simulator;
     s_cmin_wz0.tf = 100;
@@ -64,6 +63,10 @@ set(F, 'defaultLineLineWidth', 2);
 set(F, 'defaultAxesFontSize', 16);
 %% Plot trade-off regime
 load(file_str);
-plot(E, S);
+line_colour = parula(length(kz_arr));
+scatter(E, S, [], kz_arr);
 xlabel('Stabilisation error E');
 ylabel('Stabilised promoter strength S');
+set(gca,'ColorScale','log');
+cb = colorbar;
+cb.Label.String = '\kappa_z';

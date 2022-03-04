@@ -1,5 +1,5 @@
 %% simulator.m
-%%% OCTOBER 4, 2021
+%%% MARCH 4, 2022
 
 classdef simulator
     
@@ -7,7 +7,6 @@ classdef simulator
         x0;
         t;
         x;
-% %         mu;
     end
     
     properties (SetAccess = public)
@@ -31,7 +30,6 @@ classdef simulator
             obj = obj.set_x0;
             [obj.t, obj.x] = ode15s(@obj.ss_model, [0, obj.tf], ...
                 obj.x0, obj.opt);
-% %             obj = obj.get_growth_rate;
         end
         
         function plot_simulation(obj)
@@ -70,14 +68,12 @@ classdef simulator
             obj.parameters('by') = 1; % (/h)
             obj.parameters('gy') = 1; % (/h)
             obj.parameters('dy') = .347; % (/h) % Half-life ~ 2 hours
-            obj.parameters('ky') = 1; % (nM)
+            obj.parameters('ky') = 8; % (nM)
             obj.parameters('az') = 1; % (/h)
             obj.parameters('bz') = 1; % (/h)
             obj.parameters('gz') = 1; % (/h)
             obj.parameters('dz') = .347; % (/h) % Half-life ~ 2 hours
             obj.parameters('kz') = 1; % (nM)
-% %             obj.parameters('mu0') = .4; % (/h)
-% %             obj.parameters('Kmu') = 0.07; % (uM)
         end
         
         function obj = set_x0(obj)
@@ -89,18 +85,7 @@ classdef simulator
                       ];
         end
         
-% %         function obj = get_growth_rate(obj)
-% %             n = length(obj.t);
-% %             obj.mu = nan(n,1);
-% %             for z = 1:n
-% %                 xTemp = obj.x(z,:).';
-% %                 [~, muTemp] = obj.ss_model(NaN, xTemp);
-% %                 obj.mu(z) = muTemp;
-% %             end
-% %         end
-        
         function dxdt = ss_model(obj, ~, x)
-% %         function [dxdt, muTemp] = ss_model(obj, ~, x)
             %% Assign the parameters' map to the variable p
             par = obj.parameters;
             
@@ -109,10 +94,6 @@ classdef simulator
             py = x(2);
             mz = x(3);
             pz = x(4);
-            
-% %             %% Compute growth rate mu
-% %             muTemp = par('mu0') .* par('r0') ./ (par('r0') + par('Kmu') .* (...
-% %                 1 + my ./ par('ky') + mz ./ par('kz')));
             
             %% Assign the vector state dxdt
             dxdt = [
