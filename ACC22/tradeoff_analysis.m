@@ -13,7 +13,7 @@ dim_arr = length(kz_arr);
 %% Create the object 's' from the class 'simulator'
 file_str = './ss_tradeoff_data.mat';
 if ~isfile(file_str)
-    disp([file_str, 'File not found'])
+    disp([file_str, ' not found'])
     %% Create the simulate object 's_cmin_wz0'
     s_cmin_wz0 = simulator;
     s_cmin_wz0.tf = 100;
@@ -58,15 +58,14 @@ end
 %% Plot analysis
 clearvars -except file_str
 close all
-F = figure('Position', [0 0 360 360]);
+F = figure('Position', [0 0 420 360]);
 set(F, 'defaultLineLineWidth', 2);
 set(F, 'defaultAxesFontSize', 16);
 %% Plot trade-off regime
 load(file_str);
-line_colour = parula(length(kz_arr));
-scatter(E, S, [], kz_arr);
+scatter(E, S, [], 1./kz_arr);
 xlabel('Stabilisation error E');
 ylabel('Stabilised promoter strength S');
 set(gca,'ColorScale','log');
 cb = colorbar;
-cb.Label.String = '\kappa_z';
+set(gca, 'XScale', 'log', 'YScale', 'log')

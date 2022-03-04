@@ -1,18 +1,17 @@
 %% make_analysis4robustness.m
-%%% OCTOBER 10, 2021
+%%% MARCH 4, 2022
 
 clear
 
 %% Create the table 'tab'
 tab_var = {'alpha_z', 'kappa_z'};
-az_arr = [1; 1; 1; 1; 1];
-kz_arr = [1; 2; 4; 8; 16];
+az_arr = [1; 1; 1; 1; 1; 0];
+kz_arr = [1; 2; 4; 8; 16; 1];
 
 tab = table(az_arr, kz_arr, 'VariableNames', tab_var);
 
 %% Create the vector 'c_arr'
 c_arr = linspace(1e-1, 100, 1000);
-% c_arr = logspace(-2, 2, 20);
 dim_arr = length(c_arr);
 
 %% Exploring the parameter space
@@ -23,7 +22,7 @@ for q = 1:size(tab,1)
         num2str(tmp_kz), '_data.mat'];
     %% Create the object 's' from the class 'simulator'
     if ~isfile(file_str)
-        disp([file_str, ' found'])
+        disp([file_str, ' not found'])
         s = simulator;
         s.tf = 100;
         s.parameters('az') = tmp_az;
@@ -62,4 +61,3 @@ for q = 1:size(tab,1)
 end
 xlabel('Plasmid concentration c (nM)');
 ylabel('Steady-state concentration py (nM)');
-ylim([1000,3000])
